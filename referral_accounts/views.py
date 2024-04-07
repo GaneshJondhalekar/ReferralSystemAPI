@@ -84,6 +84,15 @@ class CurrentUserDetailsView(RetrieveAPIView):
     def get_object(self):
         return self.request.user
     
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response({
+            'data': serializer.data,
+            'message': 'User details fetched successfully',
+            'status_code': status.HTTP_200_OK
+        })
+    
 
 #Current users all referrals
 @api_view(['GET'])
@@ -101,8 +110,8 @@ def my_referrals_view(request):
         response_data = {
             'data': serializer.data,
             'message': "My referrals fetched successfully",
-            'status_code': status.HTTP_200_OK
-         }
+            
+        }
     
         return paginator.get_paginated_response(response_data)
     else:
