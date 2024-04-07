@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
-from .serializers import UserRegistrationSerializer,LoginSerializer,UserDetailsSerializer
+from .serializers import UserRegistrationSerializer,LoginSerializer,UserDetailsSerializer,MyReferralsSerializer
 from rest_framework import status
 from .models import User
 from rest_framework.generics import RetrieveAPIView
@@ -82,3 +82,18 @@ class CurrentUserDetailsView(RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+    
+
+#Current users all referrals
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_referrals_view(request):
+    current_user=request.user
+    referral_code=current_user.own_referral_code
+    referred_users=User.objects.filter(referral_code=referral_code)
+    serializer=MyReferralsSerializer(referred_users,many=True)
+
+    return Response({
+            'data':serializer.data,
+            'message':"My referrals fetched successfully"
+        },status=status.HTTP_200_OK)

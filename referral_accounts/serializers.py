@@ -47,3 +47,8 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         model=User
         fields=['id','name','email','referral_code','timestamp_of_registration']
 
+
+class MyReferralsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields=['id','name','timestamp_of_registration']
