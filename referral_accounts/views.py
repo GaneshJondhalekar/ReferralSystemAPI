@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
-from .serializers import UserRegistrationSerializer,LoginSerializer
+from .serializers import UserRegistrationSerializer,LoginSerializer,UserDetailsSerializer
 from rest_framework import status
 from .models import User
 from rest_framework.generics import RetrieveAPIView
@@ -63,3 +63,22 @@ def login_view(request):
             'message':"something wents wrong"
         },status=status.HTTP_400_BAD_REQUEST)
             
+#show all users registered
+@api_view(['GET'])
+def user_details_view(request):
+     Users=User.objects.all()
+     serializer=UserDetailsSerializer(Users,many=True)
+     return Response({
+            'data':serializer.data,
+            'message':"Users details fetched successfully"
+        },status=status.HTTP_200_OK)
+
+
+
+#current logged in User Details View
+class CurrentUserDetailsView(RetrieveAPIView):
+    serializer_class = UserDetailsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user

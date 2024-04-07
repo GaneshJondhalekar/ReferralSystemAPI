@@ -39,3 +39,11 @@ class LoginSerializer(serializers.Serializer):
         print(user,"Hi>>>>>>>")
         return {'data':{'token':{'access':str(access),'refresh':str(refresh)}},'message':'Login succesfull'}
 
+
+
+#user detals serializer to show data like name, email, referral_code, timestamp of registration
+class UserDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields=['id','name','email','referral_code','timestamp_of_registration']
+
