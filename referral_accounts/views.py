@@ -6,6 +6,7 @@ from rest_framework import status
 from .models import User
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework .pagination import PageNumberPagination
 
 #Register api view that accept name,email,password and referral_code(optional) to create user
 @api_view(['POST'])
@@ -91,9 +92,21 @@ def my_referrals_view(request):
     current_user=request.user
     referral_code=current_user.own_referral_code
     referred_users=User.objects.filter(referral_code=referral_code)
-    serializer=MyReferralsSerializer(referred_users,many=True)
-
-    return Response({
-            'data':serializer.data,
-            'message':"My referrals fetched successfully"
-        },status=status.HTTP_200_OK)
+    if referred_users:
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        result_page = paginator.paginate_queryset(referred_users, request)
+        serializer=MyReferralsSerializer(result_page,many=True)
+        
+        response_data = {
+            'data': serializer.data,
+            'message': "My referrals fetched successfully",
+            'status_code': status.HTTP_200_OK
+         }
+    
+        return paginator.get_paginated_response(response_data)
+    else:
+         return Response({
+                'data':{},
+                'message':"No referrals Found"
+            },status=status.HTTP_404_NOT_FOUND)
